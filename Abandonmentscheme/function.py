@@ -3,30 +3,21 @@ from time import strftime
 import os
 
 from openpyxl.styles import Alignment
-from openpyxl.utils.exceptions import InvalidFileException
 
 
 def handle_excel(file):
     if file:
-        shipid = ""
-        scantime = ""
-        YT = ""
-        try:
-            wb = load_workbook(file)  # 打开表格
-            ws = wb.active  # 激活这个workbook
-            shipid = ws['A']  # 单号
-            scantime = ws['B']  # 扫描时间
-            YT = ws['F']  # 月台号
-            if shipid[0].value != "ship_id":
-                return -1
-            elif scantime[0].value != "扫描时间":
-                return -1
-            elif YT[0].value != "月台":
-                return -1
-        except InvalidFileException:
-            return -2
-        except Exception as e:
-            return e
+        wb = load_workbook(file)  # 打开表格
+        ws = wb.active  # 激活这个workbook
+        shipid = ws['A']  # 单号
+        scantime = ws['B']  # 扫描时间
+        YT = ws['F']  # 月台号
+        if shipid[0].value != "ship_id":
+            return -1
+        elif scantime[0].value != "扫描时间":
+            return -1
+        elif YT[0].value != "月台":
+            return -1
         TSOD = []  # three super original data
         YTSET = set()  # 月台集合 不重复
         # 单元格类数据转换 对应的int datetime str 三个类型 顺便用这个循环创建了一个月台集合 分割月台的时候要用
@@ -89,7 +80,4 @@ def export_excel(widgetvaluelist, fileaddress):
     filepath = os.path.join(os.path.expanduser("~"), 'Desktop') + "\三列" + fileaddress.split("/")[-1]
     wb.save(filepath)
 
-
-def GetDaHuaVideo():
-    # 调用大华提供的SDK来获取视频
     pass

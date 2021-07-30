@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1335</width>
-    <height>783</height>
+    <width>1329</width>
+    <height>768</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,122 +15,104 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>图标64.png</normaloff>图标64.png</iconset>
+    <normaloff>C:/Users/Hast/Desktop/图标64.png</normaloff>C:/Users/Hast/Desktop/图标64.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_26">
-    <property name="topMargin">
-     <number>0</number>
-    </property>
-    <property name="bottomMargin">
-     <number>0</number>
-    </property>
+   <layout class="QGridLayout" name="gridLayout_24">
     <item row="0" column="0">
      <widget class="QGroupBox" name="groupBox_9">
       <property name="title">
        <string/>
       </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-      <property name="flat">
-       <bool>false</bool>
-      </property>
-      <property name="checkable">
-       <bool>false</bool>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_4">
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <item row="0" column="0">
         <widget class="QPushButton" name="pB1">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
+           <verstretch>1</verstretch>
           </sizepolicy>
          </property>
-         <property name="styleSheet">
-          <string notr="true"/>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>150</height>
+          </size>
          </property>
          <property name="text">
           <string>Excel处理</string>
-         </property>
-         <property name="flat">
-          <bool>true</bool>
          </property>
         </widget>
        </item>
        <item row="1" column="0">
         <widget class="QPushButton" name="pB2">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
+           <verstretch>1</verstretch>
           </sizepolicy>
          </property>
-         <property name="text">
-          <string>调取视频</string>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>150</height>
+          </size>
          </property>
-         <property name="flat">
-          <bool>true</bool>
+         <property name="text">
+          <string>通道列表</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0">
         <widget class="QPushButton" name="pB3">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
+           <verstretch>1</verstretch>
           </sizepolicy>
          </property>
-         <property name="text">
-          <string>内网快件
-查询对比</string>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>150</height>
+          </size>
          </property>
-         <property name="flat">
-          <bool>true</bool>
+         <property name="text">
+          <string>调取视频</string>
          </property>
         </widget>
        </item>
        <item row="3" column="0">
         <widget class="QPushButton" name="pB4">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
+           <verstretch>1</verstretch>
           </sizepolicy>
          </property>
-         <property name="text">
-          <string>通道月台
-绑定</string>
-         </property>
-         <property name="flat">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QPushButton" name="pB5">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>150</height>
+          </size>
          </property>
          <property name="text">
-          <string>图片标记</string>
-         </property>
-         <property name="flat">
-          <bool>true</bool>
+          <string>高级设置</string>
          </property>
         </widget>
        </item>
@@ -146,10 +128,10 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="Excel">
-       <layout class="QGridLayout" name="gridLayout_24">
+       <layout class="QGridLayout" name="gridLayout_26">
         <item row="0" column="0">
          <widget class="QGroupBox" name="groupBox">
           <property name="title">
@@ -288,13 +270,7 @@
          </widget>
         </item>
         <item row="1" column="0" rowspan="5">
-         <widget class="QTableWidget" name="excelTW">
-          <property name="minimumSize">
-           <size>
-            <width>340</width>
-            <height>0</height>
-           </size>
-          </property>
+         <widget class="QTableWidget" name="excelTableWidget">
           <row>
            <property name="text">
             <string>1</string>
@@ -384,9 +360,6 @@
         </item>
         <item row="2" column="1">
          <widget class="QPushButton" name="excelTableEditablePB">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
           <property name="text">
            <string>表格不可编辑</string>
           </property>
@@ -394,9 +367,6 @@
         </item>
         <item row="3" column="1">
          <widget class="QPushButton" name="insertRowPB">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
           <property name="text">
            <string>插入行</string>
           </property>
@@ -404,9 +374,6 @@
         </item>
         <item row="4" column="1">
          <widget class="QPushButton" name="deleteRowPB">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
           <property name="text">
            <string>删除行</string>
           </property>
@@ -427,482 +394,9 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="GetVideo">
-       <layout class="QGridLayout" name="gridLayout_6">
-        <item row="0" column="0">
-         <widget class="QGroupBox" name="groupBox_10">
-          <property name="title">
-           <string/>
-          </property>
-          <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_17">
-             <property name="text">
-              <string>摄像头IP</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="iPLineEdit">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>1</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="Line" name="line">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="3">
-            <widget class="QLabel" name="label_19">
-             <property name="text">
-              <string>端口</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="4">
-            <widget class="QLineEdit" name="portLE">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>1</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>50</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>65535</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="5">
-            <widget class="Line" name="line_2">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="6">
-            <widget class="QLabel" name="label_16">
-             <property name="text">
-              <string>账号</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="7">
-            <widget class="QLineEdit" name="usernmLE">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>1</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>admin</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="8">
-            <widget class="Line" name="line_3">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="9">
-            <widget class="QLabel" name="label_18">
-             <property name="text">
-              <string>密码</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="10">
-            <widget class="QLineEdit" name="passwdLE">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>1</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="11">
-            <widget class="Line" name="line_4">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="12">
-            <widget class="QLabel" name="label_20">
-             <property name="text">
-              <string>默认通道</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="13">
-            <widget class="QLineEdit" name="defaultChannelLE">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>1</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>30</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>0</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="14">
-            <widget class="Line" name="line_5">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="15">
-            <widget class="QLabel" name="label_22">
-             <property name="text">
-              <string>默认视频码流</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="16">
-            <widget class="QComboBox" name="defaultStreamCB">
-             <item>
-              <property name="text">
-               <string>主码流</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>辅码流</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="0" column="17">
-            <widget class="Line" name="line_6">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="18">
-            <widget class="QLabel" name="label_21">
-             <property name="text">
-              <string>默认提取方式</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="19">
-            <widget class="QComboBox" name="defaultEttractionMethodCB">
-             <property name="minimumSize">
-              <size>
-               <width>73</width>
-               <height>0</height>
-              </size>
-             </property>
-             <item>
-              <property name="text">
-               <string>秒数直截</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="1" column="0" colspan="20">
-            <widget class="QGroupBox" name="groupBox_45">
-             <property name="title">
-              <string/>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_5">
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item row="0" column="5">
-               <widget class="QPushButton" name="ListSelAllPB">
-                <property name="text">
-                 <string>全选单号</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="3">
-               <widget class="QPushButton" name="ListSelCopyPB">
-                <property name="text">
-                 <string>复制选中单号</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QPushButton" name="ListIniPB">
-                <property name="toolTip">
-                 <string>主动获取和被动self变量调取是一样的</string>
-                </property>
-                <property name="text">
-                 <string>初始化单号</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QPushButton" name="ListClearPB">
-                <property name="text">
-                 <string>清空所有单号</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="6">
-               <widget class="QPushButton" name="ListSelNonePB">
-                <property name="text">
-                 <string>全不选单号</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="8">
-               <widget class="QPushButton" name="ListSelHandlePB">
-                <property name="text">
-                 <string>开始处理选中单号</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="7">
-               <widget class="QPushButton" name="ListSelInversePB">
-                <property name="text">
-                 <string>反选单号</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2">
-               <widget class="QPushButton" name="ListInsertPB">
-                <property name="text">
-                 <string>插入单号</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="4">
-               <widget class="QPushButton" name="ListSelDeletePB">
-                <property name="text">
-                 <string>删除选中单号</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="9">
-               <widget class="QPushButton" name="ListAllStopPB">
-                <property name="text">
-                 <string>全部停止</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0" colspan="10">
-               <widget class="QTableWidget" name="shipHandleTW">
-                <row>
-                 <property name="text">
-                  <string>1</string>
-                 </property>
-                </row>
-                <row>
-                 <property name="text">
-                  <string>2</string>
-                 </property>
-                </row>
-                <row>
-                 <property name="text">
-                  <string>3</string>
-                 </property>
-                </row>
-                <row>
-                 <property name="text">
-                  <string>4</string>
-                 </property>
-                </row>
-                <row>
-                 <property name="text">
-                  <string>5</string>
-                 </property>
-                </row>
-                <row>
-                 <property name="text">
-                  <string>6</string>
-                 </property>
-                </row>
-                <row>
-                 <property name="text">
-                  <string>7</string>
-                 </property>
-                </row>
-                <row>
-                 <property name="text">
-                  <string>8</string>
-                 </property>
-                </row>
-                <row>
-                 <property name="text">
-                  <string>10</string>
-                 </property>
-                </row>
-                <column>
-                 <property name="text">
-                  <string>ship_id</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>扫描时间</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>月台</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>视频通道</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>视频码流</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>提取方式</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>下载状态</string>
-                 </property>
-                </column>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="ChannelList">
        <layout class="QGridLayout" name="gridLayout_19">
-        <item row="1" column="0">
-         <widget class="QTableWidget" name="channelListTW">
-          <row>
-           <property name="text">
-            <string>IP</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>1</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>2</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>3</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>4</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>4</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>5</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>6</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>7</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>8</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>10</string>
-           </property>
-          </row>
-          <column>
-           <property name="text">
-            <string>通道列表</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>通道列表</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>通道列表</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>通道列表</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>通道列表</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>通道列表</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>通道列表</string>
-           </property>
-          </column>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="2">
+        <item row="0" column="0">
          <widget class="QGroupBox" name="groupBox_15">
           <property name="title">
            <string/>
@@ -928,7 +422,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="iPLineEdit_3">
+               <widget class="QLineEdit" name="iPLineEdit">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>1</horstretch>
@@ -960,7 +454,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="usernmLineEdit_4">
+               <widget class="QLineEdit" name="usernmLineEdit">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>1</horstretch>
@@ -992,7 +486,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="passwdLineEdit_3">
+               <widget class="QLineEdit" name="passwdLineEdit">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>1</horstretch>
@@ -1179,6 +673,264 @@
               </size>
              </property>
             </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QTableWidget" name="channelListTableWidget">
+          <row>
+           <property name="text">
+            <string>IP</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>1</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>2</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>3</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>4</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>4</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>5</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>6</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>7</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>8</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>10</string>
+           </property>
+          </row>
+          <column>
+           <property name="text">
+            <string>通道列表</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>通道列表</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>通道列表</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>通道列表</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>通道列表</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>通道列表</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>通道列表</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="GetVideo">
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox_10">
+          <property name="title">
+           <string/>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_5">
+           <item row="0" column="0">
+            <widget class="QGroupBox" name="groupBox_45">
+             <property name="title">
+              <string/>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_4">
+              <item row="0" column="0">
+               <widget class="QPushButton" name="ListIniPB">
+                <property name="toolTip">
+                 <string>主动获取和被动self变量调取是一样的</string>
+                </property>
+                <property name="text">
+                 <string>初始化单号</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QPushButton" name="ListClearPB">
+                <property name="text">
+                 <string>清空所有单号</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QPushButton" name="ListInsertPB">
+                <property name="text">
+                 <string>插入单号</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QPushButton" name="ListSelCopyPB">
+                <property name="text">
+                 <string>复制选中单号</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="4">
+               <widget class="QPushButton" name="ListSelDeletePB">
+                <property name="text">
+                 <string>删除选中单号</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="5">
+               <widget class="QPushButton" name="ListSelAllPB">
+                <property name="text">
+                 <string>全选单号</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="6">
+               <widget class="QPushButton" name="ListSelNonePB">
+                <property name="text">
+                 <string>全不选单号</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="7">
+               <widget class="QPushButton" name="ListSelInversePB">
+                <property name="text">
+                 <string>反选单号</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="8">
+               <widget class="QPushButton" name="ListSelHandlePB">
+                <property name="text">
+                 <string>开始处理选中单号</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="9">
+               <widget class="QPushButton" name="ListAllStopPB">
+                <property name="text">
+                 <string>全部停止</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" colspan="10">
+               <widget class="QTableWidget" name="shipHandleListWidget">
+                <row>
+                 <property name="text">
+                  <string>1</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>2</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>3</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>4</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>5</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>6</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>7</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>8</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>10</string>
+                 </property>
+                </row>
+                <column>
+                 <property name="text">
+                  <string>单号</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>摄像头IP</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>时间识别</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>截屏方式</string>
+                 </property>
+                </column>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </item>
           </layout>
          </widget>
