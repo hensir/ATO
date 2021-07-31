@@ -1,14 +1,65 @@
 import sys
 import os
-from PyQt5.QtCore import pyqtSlot, Qt
+from PyQt5.QtCore import pyqtSlot, Qt, QDate, QThread, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem, QAbstractItemView
 from UI_MainWindow import Ui_MainWindow
 from function import handle_excel, export_excel
+from ctypes import *
+from NetSDK.NetSDK import NetClient
+from NetSDK.SDK_Enum import EM_USEDEV_MODE, EM_QUERY_RECORD_TYPE, EM_LOGIN_SPAC_CAP_TYPE
+from NetSDK.SDK_Callback import fDisConnect, fHaveReConnect
+from NetSDK.SDK_Struct import NET_TIME, NET_RECORDFILE_INFO, NET_IN_PLAY_BACK_BY_TIME_INFO, \
+    NET_OUT_PLAY_BACK_BY_TIME_INFO, \
+    C_LLONG, C_DWORD, C_LDWORD, NET_IN_LOGIN_WITH_HIGHLEVEL_SECURITY, NET_OUT_LOGIN_WITH_HIGHLEVEL_SECURITY, \
+    CB_FUNCTYPE, sys_platform
 
 
 # TODO 安全措施
 # TODO IP是否输入 账号 密码  初始化列表 导入现在这个表 然后做修改代理 视频通道全取默认通道 截屏方式默认 秒数直接
-# 他写的线程不错 我也要用 做下载完成提示
+# TODO 现在编辑时间
+
+# 继承QThread
+class Mythread(QThread):
+    # 定义信号,定义参数为int, int类型
+    breakSignal = pyqtSignal(int, int)
+
+    def __init__(self, parent=None, dwTotalSize=1, dwDownLoadSize=0):
+        super().__init__(parent)
+        self.dwTotalSize = dwTotalSize
+        self.dwDownLoadSize = dwDownLoadSize
+
+    def run(self):
+        self.breakSignal.emit(self.dwTotalSize, self.dwDownLoadSize)
+
+    def update_data(self, total_size, download_size):
+        self.breakSignal.emit(total_size, download_size)
+
+
+global wnd
+
+
+@CB_FUNCTYPE(None, C_LLONG, C_DWORD, C_DWORD, C_LDWORD)
+def DownLoadPosCallBack(lLoginID, pchDVRIP, nDVRPort, dwUser):
+    pass
+
+
+@CB_FUNCTYPE(c_int, C_LLONG, C_DWORD, POINTER(c_ubyte), C_DWORD, C_LDWORD)
+def DownLoadDataCallBack(lPlayHandle, dwDataType, pBuffer, dwBufSize, dwUser):
+    # buf_data = cast(pBuffer, POINTER(c_ubyte * dwBufSize)).contents
+    # with open('./buffer.dav', 'ab+') as buf_file:
+    #     buf_file.write(buf_data)
+    return 1
+
+
+@CB_FUNCTYPE(None, C_LLONG, C_DWORD, C_DWORD, c_int, NET_RECORDFILE_INFO,
+             C_LDWORD)
+def TimeDownLoadPosCallBack(lPlayHandle, dwTotalSize, dwDownLoadSize, index,
+                            recordfileinfo, dwUser):
+    try:
+        wnd.update_download_progress_thread(dwTotalSize, dwDownLoadSize)
+    except Exception as e:
+        print(e)
+
 
 class QmyMainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -30,6 +81,23 @@ class QmyMainWindow(QMainWindow):
         self.ui.excelTW.horizontalHeader().setVisible(True)  # 列头可见
         self.ui.excelTW.verticalHeader().setVisible(True)  # 行头可见
         self.ui.excelTW.setEditTriggers(QAbstractItemView.NoEditTriggers)  # 默认不允许编辑
+        # 大华sdk
+
+        # NetSDK用到的相关变量和回调
+        self.loginID = C_LLONG()
+        self.downloadID = C_LLONG()
+        self.m_DisConnectCallBack = fDisConnect(self.DisConnectCallBack)
+        self.m_ReConnectCallBack = fHaveReConnect(self.ReConnectCallBack)
+
+        self.thread = Mythread()
+        self.thread.breakSignal.connect(self.update_download_progress)  # 连接刷新进度条的方法
+        self.thread.start()
+
+        # 获取NetSDK对象并初始化
+        self.sdk = NetClient()
+        self.sdk.InitEx(self.m_DisConnectCallBack)
+        self.sdk.SetAutoReconnect(self.m_ReConnectCallBack)
+
         # 测试预填充数据
         self._excelFileAddress = "C:\\Users\\Hast\\Desktop\\07.19\\表2\\广东中山分拨中心.xlsx"
         self.ui.handlePB.click()
@@ -155,6 +223,24 @@ class QmyMainWindow(QMainWindow):
         except Exception as e:  # 捕捉所有错误
             print(e)
             return
+
+        # 这里检测有没有登录 如果没有登录 就报个弹窗    # 或者没登录 初始化也没用 就直接setenable
+        if self.loginID is None:  # 这个数值登录成功是登录句柄 失败则为0   如果loginid不为空
+            pass
+        else:
+            dlgTitle = "Question"
+            strInfo = "检测未登录,是否继续初始化单号?"
+            defaultBtn = QMessageBox.NoButton  # 缺省按钮
+            result = QMessageBox.question(self, dlgTitle, strInfo,
+                                          QMessageBox.Yes | QMessageBox.No,
+                                          defaultBtn)
+            if result == QMessageBox.Yes:
+                pass
+            elif result == QMessageBox.No:
+                return
+            else:
+                return
+
         # excelTWValue = self.GetExcelTWValue()
         print(excelTWValue)  # 处理成功 放到table上
         self.ui.shipHandleTW.setRowCount(len(excelTWValue))  # 设置数据区行数
@@ -167,7 +253,7 @@ class QmyMainWindow(QMainWindow):
                     # item.setSelected(True)
                 self.ui.shipHandleTW.setItem(ODIndex, TDIndex, item)  # 向坐标 设置项目
                 # 设置默认通道
-                item = QTableWidgetItem(str(self.ui.defaultChannelLE.text()))
+                item = QTableWidgetItem(str(self.ui.defaultChannelCB.currentText()))
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)  # 垂直水平居中
                 self.ui.shipHandleTW.setItem(ODIndex, TDIndex + 1, item)  # 列加一 默认通道项目
 
@@ -269,28 +355,200 @@ class QmyMainWindow(QMainWindow):
         checkedstateList = self.HandleShipCR(rowcount, column, setshipHandleTWFCCTI)
         print(checkedstateList)
 
-    @pyqtSlot()
-    def on_ListSelHandlePB_clicked(self):  # 开始下载选中单号
-        # 登录参数
-        IP = self.ui.iPLineEdit.text()
-        PORT = self.ui.portLE.text()
-        USERNAME = self.ui.usernmLE.text()
-        PASSWORD = self.ui.passwdLE.text()
-        # 下载参数
-        # CHANNEL = self.ui.defaultChannelLE.text()
-        # STREAM = self.ui.defaultStreamCB.currentIndex()
-        # EttractionMethod = self.ui.defaultEttractionMethodCB.currentIndex()
-        TWV = self.GetShipHandleTWValue()  # TableWidgetValue
-        LPL = [IP, PORT, USERNAME, PASSWORD]  # login parameter list
-        # GetDaHuaVideo(LPL, TWV)
+    # @pyqtSlot()
+    # def on_ListSelHandlePB_clicked(self):  # 开始下载选中单号
+    #     # 登录参数
+    #     IP = self.ui.iPLineEdit.text()
+    #     PORT = self.ui.portLE.text()
+    #     USERNAME = self.ui.usernmLE.text()
+    #     PASSWORD = self.ui.passwdLE.text()
+    #     # 下载参数
+    #     # CHANNEL = self.ui.defaultChannelLE.text()
+    #     # STREAM = self.ui.defaultStreamCB.currentIndex()
+    #     # EttractionMethod = self.ui.defaultEttractionMethodCB.currentIndex()
+    #     TWV = self.GetShipHandleTWValue()  # TableWidgetValue
+    #     LPL = [IP, PORT, USERNAME, PASSWORD]  # login parameter list
+    #     # GetDaHuaVideo(LPL, TWV)
 
     @pyqtSlot()
-    def on_ListAllStopPB_clicked(self):  # 全部停止下载按钮
-        pass
+    def on_LoginPB_clicked(self):
+        if not self.loginID:
+            ip = self.ui.iPLineEdit.text()
+            port = int(self.ui.portLE.text())
+            username = self.ui.usernmLE.text()
+            password = self.ui.passwdLE.text()
+            stuInParam = NET_IN_LOGIN_WITH_HIGHLEVEL_SECURITY()
+            stuInParam.dwSize = sizeof(NET_IN_LOGIN_WITH_HIGHLEVEL_SECURITY)
+            stuInParam.szIP = ip.encode()
+            stuInParam.nPort = port
+            stuInParam.szUserName = username.encode()
+            stuInParam.szPassword = password.encode()
+            stuInParam.emSpecCap = EM_LOGIN_SPAC_CAP_TYPE.TCP
+            stuInParam.pCapParam = None
+
+            stuOutParam = NET_OUT_LOGIN_WITH_HIGHLEVEL_SECURITY()
+            stuOutParam.dwSize = sizeof(NET_OUT_LOGIN_WITH_HIGHLEVEL_SECURITY)
+
+            self.loginID, device_info, error_msg = self.sdk.LoginWithHighLevelSecurity(
+                stuInParam, stuOutParam)
+            if self.loginID != 0:
+                title = self.windowTitle()
+                self.setWindowTitle(title + ' 在线(OnLine)')
+                # self.Login_pushButton.setText('登出')
+                self.ui.LoginPB.setText('登出')
+                self.ui.ListSelHandlePB.setEnabled(True)
+                self.ui.defaultChannelCB.setEnabled(True)
+                self.ui.defaultStreamCB.setEnabled(True)
+
+                self.set_stream_type(0)
+                for i in range(int(device_info.nChanNum)):
+                    self.defaultChannelCB.addItem(str(i))
+            else:
+                QMessageBox.about(self, '提示(prompt)', error_msg)
+        else:
+            if self.downloadID:
+                self.sdk.StopDownload(self.downloadID)
+                self.downloadID = 0
+            result = self.sdk.Logout(self.loginID)
+            if result:
+                title = self.windowTitle()
+                self.setWindowTitle(title + " 离线(OffLine)")
+                # self.Login_pushButton.setText("登录(Login)")
+                self.ui.LoginPB.setText("登录")
+                self.loginID = 0
+                self.ui.defaultStreamCB.setEnabled(True)
+                self.ui.ListSelHandlePB.setEnabled(True)
+                self.ui.defaultChannelCB.setEnabled(True)
+                self.ui.ListSelHandlePB.setText("开始下载选中单号")
+                self.defaultChannelCB.clear()
+                self.ui.downloadBar.setValue(0)
+                self.thread.update_data(1, 0)
+
+    def on_ListSelHandlePB_clicked(self):
+        if not self.downloadID:
+            TWVList = self.GetShipHandleTWValue()  # TableWidgetValueList
+            # 这上面有 shipid  扫描时间 视频通道 视频码流
+            for TWV in TWVList:
+                print(TWV)
+                front = os.path.dirname(__file__)
+                behind = "/%s.dav" % TWV[0]
+                save_file_name = front + behind
+
+                if TWV[3] != "":        # TODO 看到这里 就确定 登陆之前初始化单号不能运行 我现在是做测试 所有的测试代码
+                    nchannel = int(TWV[3])  # 视频通道      # 像这种庇护的都要删除掉
+                else:
+                    nchannel = ""
+                if TWV[4] == "主码流":
+                    stream_type = 0
+                    # self.set_stream_type(stream_type)
+                else:
+                    stream_type = 0
+                    self.set_stream_type(stream_type)
+
+                time = TWV[1].strftime("%Y-%m-%d %H:%M:%S")
+
+                startDateTime = NET_TIME()
+                startDateTime.dwYear = 2021
+                startDateTime.dwMonth = 7
+                startDateTime.dwDay = 19
+                startDateTime.dwHour = 5
+                startDateTime.dwMinute = 30
+                startDateTime.dwSecond = 30
+
+                enddateTime = NET_TIME()
+                enddateTime.dwYear = 2021
+                enddateTime.dwMonth = 7
+                enddateTime.dwDay = 19
+                enddateTime.dwHour = 5
+                enddateTime.dwMinute = 30
+                enddateTime.dwSecond = 35
+
+                self.downloadID = self.sdk.DownloadByTimeEx(
+                    self.loginID, nchannel, int(EM_QUERY_RECORD_TYPE.ALL),
+                    startDateTime, enddateTime, save_file_name,
+                    TimeDownLoadPosCallBack, 0, DownLoadDataCallBack, 0)
+                if self.downloadID:
+                    # self.Download_pushButton.setText("停止(Stop)")
+                    self.ui.ListSelHandlePB.setText("停止下载")
+                else:
+                    QMessageBox.about(self, '提示(prompt)',
+                                      self.sdk.GetLastErrorMessage())
+        else:
+            result = self.sdk.StopDownload(self.downloadID)
+            if result:
+                self.downloadID = 0
+                self.ui.ListSelHandlePB.setText("开始下载选中单号")
+                self.ui.downloadBar.setValue(0)
+                self.thread.update_data(1, 0)
+            else:
+                QMessageBox.about(self, '提示(prompt)',
+                                  self.sdk.GetLastErrorMessage())
+
+    def set_stream_type(self, stream_type):
+        # set stream type;设置码流类型
+        stream_type = c_int(stream_type)
+        result = self.sdk.SetDeviceMode(self.loginID,
+                                        int(EM_USEDEV_MODE.RECORD_STREAM_TYPE),
+                                        stream_type)
+        if not result:
+            QMessageBox.about(self, '提示(prompt)',
+                              self.sdk.GetLastErrorMessage())
+            return 0, 0, None
+
+    def update_download_progress_thread(self, totalsize, downloadsize):
+        try:
+            self.thread.update_data(totalsize, downloadsize)
+        except Exception as e:
+            print(e)
+
+    # 实现断线回调函数功能
+    def DisConnectCallBack(self, lLoginID, pchDVRIP, nDVRPort, dwUser):
+        title = self.windowTitle()
+        self.setWindowTitle(title + " 离线(OffLine)")
+
+    # 实现断线重连回调函数功能
+    def ReConnectCallBack(self, lLoginID, pchDVRIP, nDVRPort, dwUser):
+        title = self.windowTitle()
+        self.setWindowTitle(title + ' 在线(OnLine)')
+
+    # 关闭主窗口时清理资源
+    def closeEvent(self, event):
+        event.accept()
+        if self.loginID:
+            self.sdk.Logout(self.loginID)
+        self.sdk.Cleanup()
+
+    def update_download_progress(self, total_size, download_size):
+        try:
+            if download_size == -1:
+                self.downloadID = 0
+                # self.Download_progressBar.setValue(0)
+                self.ui.downloadBar.setValue(0)
+                self.sdk.StopDownload(self.downloadID)
+                self.ui.ListSelHandlePB.setText("开始下载选中单号")
+                QMessageBox.about(self, '提示(prompt)', "Download End(下载结束)!")
+            elif download_size == -2:
+                self.downloadID = 0
+                # self.Download_progressBar.setValue(0)
+                self.ui.downloadBar.setValue(0)
+                # self.Download_pushButton.setText("下载(download)")
+                self.ui.ListSelHandlePB.setText("开始下载选中单号")
+                QMessageBox.about(self, '提示(prompt)', "Download Failed(下载失败)!")
+            else:
+                if download_size >= total_size:
+                    # self.Download_progressBar.setValue(100)
+                    self.ui.downloadBar.setValue(0)
+                else:
+                    percentage = int(download_size * 100 / total_size)
+                    # self.Download_progressBar.setValue(percentage)
+                    self.ui.downloadBar.setValue(percentage)
+        except Exception as e:
+            print(e)
 
 
 if __name__ == "__main__":  # 用于当前窗体测试
     app = QApplication(sys.argv)  # 创建GUI应用程序
     form = QmyMainWindow()  # 创建窗体
+    wnd = form
     form.show()
     sys.exit(app.exec_())

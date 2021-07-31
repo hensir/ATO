@@ -67,6 +67,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         super(MyMainWindow, self).__init__(parent)
         self.setupUi(self)
 
+
         # 界面初始化
         self._init_ui()
 

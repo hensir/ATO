@@ -124,8 +124,3 @@ def export_excel(widgetvaluelist, fileaddress):
     ws.column_dimensions['B'].width = 25
     filepath = os.path.join(os.path.expanduser("~"), 'Desktop') + "\\ATO" + fileaddress.split("/")[-1]
     wb.save(filepath)
-
-
-def GetDaHuaVideo(LoginList, ValueList):
-    # 调用大华提供的SDK来获取视频
-    pass

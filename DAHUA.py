@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget
 from PyQt5.QtCore import Qt, QDate, QThread, pyqtSignal
 from ctypes import *
 
-from PlayBackUI import Ui_MainWindow
+# from PlayBackUI import Ui_MainWindow
 from NetSDK.NetSDK import NetClient
 from NetSDK.SDK_Enum import EM_USEDEV_MODE, EM_QUERY_RECORD_TYPE, EM_LOGIN_SPAC_CAP_TYPE
 from NetSDK.SDK_Struct import NET_TIME, NET_RECORDFILE_INFO, NET_IN_PLAY_BACK_BY_TIME_INFO, \
@@ -18,7 +18,7 @@ from NetSDK.SDK_Callback import fDisConnect, fHaveReConnect
 
 
 class Dahua(object):
-    def __init__(self, pardent=None):
+    def __init__(self):
         super().__init__()
         # NetSDK用到的相关变量
         self.loginID = C_LLONG()
@@ -120,3 +120,15 @@ class Dahua(object):
             QMessageBox.about(self.widget, '提示(prompt)',
                               self.sdk.GetLastErrorMessage())
             return 0, 0, None
+
+    def activeClose(self):
+        if self.loginID:
+            self.sdk.Logout(self.loginID)
+        self.sdk.Cleanup()
+
+
+if __name__ == '__main__':
+    dahua = Dahua()
+    dahua.login()
+    dahua.download()
+    dahua.activeClose()
