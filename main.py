@@ -1,20 +1,17 @@
-"""
-大华提供了抓图功能 然后windows自带的画图功能 可问题依然是时间调整 成功了 这个视频是个video 或者 dav的一秒视频 切帧 360的ie内核有点问题 卡
-换成ie 大华的抓图命名是时间 到时候控制文件夹 文件名称对比单号右边第二列时间数据就能确认了 当然这是精确到秒的 webkit 不能抓图   不能截取视频
-抓图还好 视频就太大了 所以全部都用trident 不一定 老ie没currenttime 没法跳时间 chrome改改还能用
-webkit中video怎么跳时间那个canvas倒是一直在动 只有ie9+才支持video标签
-"""
 import sys
 import os
-from PyQt5.QtCore import QDir, pyqtSlot, Qt, QPoint
+from PyQt5.QtCore import pyqtSlot, Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem, QAbstractItemView
 from UI_MainWindow import Ui_MainWindow
-from function import handle_excel, export_excel
+from function import handle_excel, export_excel, GetDaHuaVideo
+
+
 # from PyQt5.Qt import Itemis
 
 
 # TODO 安全措施
 # TODO IP是否输入 账号 密码  初始化列表 导入现在这个表 然后做修改代理 视频通道全取默认通道 截屏方式默认 秒数直接
+
 
 class QmyMainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -36,6 +33,10 @@ class QmyMainWindow(QMainWindow):
         self.ui.excelTW.horizontalHeader().setVisible(True)  # 列头可见
         self.ui.excelTW.verticalHeader().setVisible(True)  # 行头可见
         self.ui.excelTW.setEditTriggers(QAbstractItemView.NoEditTriggers)  # 默认不允许编辑
+        # 测试预填充数据
+        self._excelFileAddress = "C:\\Users\\Hast\\Desktop\\07.19\\表2\\广东中山分拨中心.xlsx"
+        self.ui.handlePB.click()
+        self.ui.ListIniPB.click()
 
     # 类方法 内部要用的方法
     def GetExcelTWValue(self):
@@ -47,19 +48,43 @@ class QmyMainWindow(QMainWindow):
             for column in range(columncount):  # 循环坐标取值
                 tablewidgetvalue[row].append(self.ui.excelTW.item(row, column).text())
         print(tablewidgetvalue)
-        return tablewidgetvalue
+        return tablewidgetvalue  # 打印并返回获取到的数值
 
     def GetShipHandleTWValue(self):
         # 获取并返回shiphandleTW表格组件的所有数据
-        # TODO 范围调整一下
         rowcount = self.ui.shipHandleTW.rowCount()
-        columncount = self.ui.shipHandleTW.columnCount()  # 总行数 总列数
+        columncount = self.ui.shipHandleTW.columnCount() - 1  # 总行数 总列数 因为最后一列的下载状态是不需要的数据所以减一
         tablewidgetvalue = [[] for i in range(rowcount)]  # 创建二维列表空间
         for row in range(rowcount):
             for column in range(columncount):  # 循环坐标取值
-                tablewidgetvalue[row].append(self.ui.shipHandleTW.item(row, column).text())
+                tablewidgetvalue[row].append(str(self.ui.shipHandleTW.item(row, column).text()))
         print(tablewidgetvalue)
-        return tablewidgetvalue
+        return tablewidgetvalue  # 打印并返回获取到的数值
+
+    def GetShipHandleTWFCCS(self):  # getshiphandletablewidgetfristcolumncheckedState
+        """ 遍历shiphandleTW的第一列 获取checked的状态 这个一般用不到了"""
+
+        rowcount = self.ui.shipHandleTW.rowCount()
+        column = 1                                  # 因为是第一列所以总行和column——1
+
+        def GetItemChecked(x, y):                   # 将要用于处理所有列单元格的函数
+            return self.ui.shipHandleTW.item(x, y).checkState()
+
+        checkedList = self.HandleShipCR(rowcount, column, GetItemChecked)
+        print(checkedList)
+        # self.ui.shipHandleTW.
+        return checkedList                      # 打印并返回列表数据
+
+    # 向下开发  指定列，指定行，指定函数并遍历用于索引内的单元格,返回处理后的cell项目
+    def HandleShipCR(self, row, column, function):  # handle ship ColumnRow
+        ProedList = []
+        for r in range(row):
+            for c in range(column):
+                item = function(r, c)  # 内建方法 item(x,y)
+                ProedList.append(item)      # 追加函数返回的数值
+                if item is None:            # 如果自定义遍历处理函数返回None 则说明用户想要退出
+                    return ProedList        # 目前是这样的 不确定这个判断以后还能不能用
+        return ProedList
 
     # 通过内建信号自动连接信号的槽函数
     @pyqtSlot()
@@ -107,10 +132,10 @@ class QmyMainWindow(QMainWindow):
         # 导出  调用类方法取出excel表格组件中的数组 传给导出为excel函数
         excelTWValue = self.GetExcelTWValue()
         export_excel(excelTWValue, self._excelFileAddress)  # 列表传给导出函数
-        self.ui.statusbar.showMessage("导出成功", 3000)
+        self.ui.statusbar.showMessage("导出成功", 3000)         # 状态栏显示3秒
 
     @pyqtSlot()
-    def on_excelTableEditablePB_clicked(self):  # 表格可编辑
+    def on_excelTableEditablePB_clicked(self):  # 表格是否可以编辑
         # 取当前状态然后做反选
         status = self.ui.excelTableEditablePB.text()
         if status == "表格可编辑":
@@ -124,16 +149,16 @@ class QmyMainWindow(QMainWindow):
 
     @pyqtSlot()
     def on_ListIniPB_clicked(self):  # 初始化单号按钮
-        excelTWValue = []
+        # excelTWValue = []
         try:
-            excelTWValue = self.GetExcelTWValue()
+            excelTWValue = self.GetExcelTWValue()   # 获取excelTW的数据
         except AttributeError:
             QMessageBox.warning(self, "警告", "Excel处理表为空")
             return
-        except Exception as e:
+        except Exception as e:                      # 捕捉所有错误
             print(e)
             return
-        excelTWValue = self.GetExcelTWValue()
+        # excelTWValue = self.GetExcelTWValue()
         print(excelTWValue)  # 处理成功 放到table上
         self.ui.shipHandleTW.setRowCount(len(excelTWValue))  # 设置数据区行数
         for ODIndex, ODL in enumerate(excelTWValue):  # one-dimensional list
@@ -153,14 +178,98 @@ class QmyMainWindow(QMainWindow):
                 item = QTableWidgetItem(str(self.ui.defaultStreamCB.currentText()))
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)  # 垂直水平居中
                 # item.setFlags(Qt.ItemIsEditable)
-                self.ui.shipHandleTW.setItem(ODIndex, TDIndex + 2, item)  # 列加一 默认视频码流
+                self.ui.shipHandleTW.setItem(ODIndex, TDIndex + 2, item)  # 列加二 默认视频码流
 
                 # 设置默认提取方式
                 item = QTableWidgetItem(str(self.ui.defaultEttractionMethodCB.currentText()))
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)  # 垂直水平居中
                 # item.setFlags(Qt.ItemIsEditable)
-                self.ui.shipHandleTW.setItem(ODIndex, TDIndex + 3, item)
+                self.ui.shipHandleTW.setItem(ODIndex, TDIndex + 3, item)    # 列加三 默认提取方式
         self.ui.shipHandleTW.resizeColumnsToContents()  # 调整列宽
+
+    @pyqtSlot()
+    def on_ListClearPB_clicked(self):  # 清空所有单号按钮
+        self.ui.shipHandleTW.clearContents()
+
+    @pyqtSlot()
+    def on_ListSelDeletePB_clicked(self):  # 删除选中单号按钮
+        #  循环执行 已选单元格次数的遍历处理单元格自定义函数
+        #
+        rowcount = self.ui.shipHandleTW.rowCount()
+        column = 1
+
+        # 获取已选单元格总数   TODO 这个东西我写过类方法 记得替换一下 当然是完全可以替换的 下面那个判断的判断值也改为Checked才更符合思路
+        def getshipHandleTWFCCC(x, y):  # getShipHandleTableWidgetFristColumnCheckedCount
+            if self.ui.shipHandleTW.item(x, y).checkState() == Qt.Checked:
+                return True
+            else:
+                return -1          # 如果为已选状态返回True 否则None
+        # TODO 问题出现了 这个-1的判断替代None 如果是None的话就只能删除一个选项了 是因为None的判读
+        # TODO 再做一个完美的返回值 不过这个明显不急
+
+        CheckedCountList = self.HandleShipCR(rowcount, column, getshipHandleTWFCCC)
+        print(CheckedCountList)
+        CheckedCount = 0
+        for i in CheckedCountList:  # 因为HandleShipCR比较底层 所以用循环来处理 已选总数
+            if i is True:
+                CheckedCount += 1
+
+        print(CheckedCount)
+
+        def deleteshipHandleTWFC(x, y):  # setshipHandleTWFirstColumnCheckToInverse
+            """定义删除行遍历处理函数"""
+            # print(self.ui.shipHandleTW.item(x, y).text())
+            if self.ui.shipHandleTW.item(x, y).checkState() == Qt.Checked:
+                self.ui.shipHandleTW.removeRow(x)
+                return
+
+        # 因为一旦删除一行之后 TW组件的索引会立即更新 而原处理方式的for循环的索引还是不变 举个例子，第一行已经删除了 第二行索引变为0
+        # 而现在的for的i索引是1 这样就会索引到原本意义列表的第三行数据 所以我做了一个处理 在删除一行之后 立刻退出 然后重新开始遍历
+        # 遍历总次数就是上面获取的 已选状态总数
+        for i in range(CheckedCount):
+            self.HandleShipCR(rowcount, column, deleteshipHandleTWFC)
+
+    @pyqtSlot()
+    def on_ListSelAllPB_clicked(self):  # 选择所有单号按钮
+        rowcount = self.ui.shipHandleTW.rowCount()
+        column = 1
+
+        # 遍历shiphandleTW的第一列数据并设置所有的item的checkstate都为Checked
+        def setshipHandleTWFCCTT(x, y):  # setshipHandleTWFirstCoulumnCheckstateToTrue
+            self.ui.shipHandleTW.item(x, y).setCheckState(Qt.Checked)
+            return self.ui.shipHandleTW.item(x, y).checkState()
+
+        checkedstateList = self.HandleShipCR(rowcount, column, setshipHandleTWFCCTT)
+        print(checkedstateList)
+
+    @pyqtSlot()
+    def on_ListSelNonePB_clicked(self):  # 取消选择所有单号按钮
+        rowcount = self.ui.shipHandleTW.rowCount()
+        column = 1
+
+        # 遍历shiphandleTW的第一列数据并设置所有的item的checkstate都为Unchecked
+        def setshipHandleTWFCCTF(x, y):  # setshipHandleTWFirstCoulumnCheckstateToFalse
+            self.ui.shipHandleTW.item(x, y).setCheckState(Qt.Unchecked)
+            return self.ui.shipHandleTW.item(x, y).checkState()
+
+        checkedstateList = self.HandleShipCR(rowcount, column, setshipHandleTWFCCTF)
+        print(checkedstateList)
+
+    @pyqtSlot()
+    def on_ListSelInversePB_clicked(self):  # 反向选择单号按钮
+        rowcount = self.ui.shipHandleTW.rowCount()
+        column = 1
+
+        # 遍历shiphandleTW的第一列数据并检测当前item的选中状态做反转操作
+        def setshipHandleTWFCCTI(x, y):  # setshipHandleTWFirstColumnCheckToInverse
+            if self.ui.shipHandleTW.item(x, y).checkState() != Qt.Checked:
+                self.ui.shipHandleTW.item(x, y).setCheckState(Qt.Checked)
+            else:
+                self.ui.shipHandleTW.item(x, y).setCheckState(Qt.Unchecked)
+            return self.ui.shipHandleTW.item(x, y).checkState()
+
+        checkedstateList = self.HandleShipCR(rowcount, column, setshipHandleTWFCCTI)
+        print(checkedstateList)
 
     @pyqtSlot()
     def on_ListSelHandlePB_clicked(self):  # 开始下载选中单号
@@ -170,10 +279,15 @@ class QmyMainWindow(QMainWindow):
         USERNAME = self.ui.usernmLE.text()
         PASSWORD = self.ui.passwdLE.text()
         # 下载参数
-        CHANNEL = self.ui.defaultChannelLE.text()
-        STREAM = self.ui.defaultStreamCB.currentIndex()
-        EttractionMethod = self.ui.defaultEttractionMethodCB.currentIndex()
-        # 打包时间 打包参数 这样就没用遮遮掩掩了 可是要发起多少次啊
+        # CHANNEL = self.ui.defaultChannelLE.text()
+        # STREAM = self.ui.defaultStreamCB.currentIndex()
+        # EttractionMethod = self.ui.defaultEttractionMethodCB.currentIndex()
+        TWV = self.GetShipHandleTWValue()  # TableWidgetValue
+        LPL = [IP, PORT, USERNAME, PASSWORD]  # login parameter list
+        GetDaHuaVideo(LPL, TWV)
+
+    @pyqtSlot()
+    def on_ListAllStopPB_clicked(self):  # 全部停止下载按钮
         pass
 
 

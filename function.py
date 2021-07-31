@@ -5,6 +5,42 @@ import os
 from openpyxl.styles import Alignment
 from openpyxl.utils.exceptions import InvalidFileException
 
+# 内网快件查询 代码暂存
+# from selenium.webdriver.chrome.options import Options
+# from selenium import webdriver
+# from selenium.webdriver.common.keys import Keys
+# import time
+#
+# exe_data = r'C:\Users\Hast\AppData\Local\360Chrome\Chrome\Application\360chrome.exe'    #浏览器根目录所在地
+# chrome_driver = r"C:\Users\Hast\AppData\Local\360Chrome\Chrome\Application\chromedriver.exe"
+#
+# chrome_options = Options()
+# chrome_options.binary_location =exe_data
+# # chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9999")
+#
+# #
+#
+# driver = webdriver.Chrome(chrome_driver,chrome_options=chrome_options)
+# # driver.get('https://khd.yundasys.com/')
+# driver.get('https://idaas.yundasys.com:10443/frontend/login#/login?sp_code=82d6069b1f73569af4d054a4d3d534b6iSMc3qflHGC&application_key=yundaplugin_cas_apereo100&application_disabled=false')
+# driver.implicitly_wait(10)
+#
+# # driver.find_element_by_id("kw").send_keys("xiaobai" + Keys.RETURN)
+# # time.sleep(10)
+# # driver.quit()
+#
+# driver.switch_to.frame('customLoginpage')
+# driver.find_element_by_xpath('/html/body/div/div[4]/div/div[1]/span[1]').click()
+# print("登录")
+# driver.find_element_by_xpath('/html/body/div/div[4]/div/div[1]/ul/li[2]').click()
+# print("密码登录")
+# driver.find_element_by_xpath('/html/body/div/div[4]/div/div[2]/div[2]/form/div[1]/input').send_keys("90086965")
+# print("输入账号")
+# # driver.find_element_by_xpath('/html/body/div/div[4]/div/div[2]/div[3]/form/div[2]/input').send_keys("Z2stt123456")
+# driver.find_element_by_xpath('/html/body/div/div[4]/div/div[2]/div[2]/form/div[2]/input').send_keys("Z2stt123456")
+# print("输入密码")
+# driver.find_element_by_xpath('/html/body/div/div[4]/div/div[2]/div[2]/form/div[4]/button').click()
+# print("登录账号")
 
 def handle_excel(file):
     if file:
@@ -86,10 +122,10 @@ def export_excel(widgetvaluelist, fileaddress):
         i.alignment = Alignment(horizontal='left', vertical='center')
     ws.column_dimensions['A'].width = 20
     ws.column_dimensions['B'].width = 25
-    filepath = os.path.join(os.path.expanduser("~"), 'Desktop') + "\三列" + fileaddress.split("/")[-1]
+    filepath = os.path.join(os.path.expanduser("~"), 'Desktop') + "\\ATO" + fileaddress.split("/")[-1]
     wb.save(filepath)
 
 
-def GetDaHuaVideo():
+def GetDaHuaVideo(LoginList, ValueList):
     # 调用大华提供的SDK来获取视频
     pass
