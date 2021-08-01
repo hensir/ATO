@@ -1,9 +1,12 @@
+import subprocess
+
 from openpyxl import load_workbook, Workbook
 from time import strftime
 import os
 
 from openpyxl.styles import Alignment
 from openpyxl.utils.exceptions import InvalidFileException
+
 
 # 内网快件查询 代码暂存
 # from selenium.webdriver.chrome.options import Options
@@ -124,3 +127,28 @@ def export_excel(widgetvaluelist, fileaddress):
     ws.column_dimensions['B'].width = 25
     filepath = os.path.join(os.path.expanduser("~"), 'Desktop') + "\\ATO" + fileaddress.split("/")[-1]
     wb.save(filepath)
+
+
+def ConvertVideosInFoldersToPicture(ffmpegaddress, folderaddress):
+    """
+    列出FR下的所有文件 检测文件扩展名为dav 开始处理这个文件 -r 1 暂时没有添加-framerate 帧数 这个参数
+    :param ffmpegaddress:FFmpeg的文件地址
+    :param folderaddress:将要处理的视频所在文件夹
+    :return:
+    """
+    all_file = os.listdir(folderaddress)
+    print(ffmpegaddress)
+    print(folderaddress)
+    for file in all_file:
+        shipid = os.path.splitext(file)[0]
+        ext = os.path.splitext(file)[1]
+        print(file)
+        print(shipid)
+        print(ext)
+        if ext == ".dav":
+            parameter = " -i {}\\{} -r 1 {}\\%3d.jpeg".format(videoprocessaddress, file, videoprocessaddress)
+            print(parameter)
+            cmd = ffmpegaddress + parameter
+            print(cmd)
+            subprocess.Popen(cmd)
+

@@ -3,7 +3,7 @@ import os
 from PyQt5.QtCore import pyqtSlot, Qt, QDate, QThread, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem, QAbstractItemView
 from UI_MainWindow import Ui_MainWindow
-from function import handle_excel, export_excel
+from function import handle_excel, export_excel, ConvertVideosInFoldersToPicture
 from ctypes import *
 from NetSDK.NetSDK import NetClient
 from NetSDK.SDK_Enum import EM_USEDEV_MODE, EM_QUERY_RECORD_TYPE, EM_LOGIN_SPAC_CAP_TYPE
@@ -16,7 +16,7 @@ from NetSDK.SDK_Struct import NET_TIME, NET_RECORDFILE_INFO, NET_IN_PLAY_BACK_BY
 
 # TODO 安全措施
 # TODO IP是否输入 账号 密码  初始化列表 导入现在这个表 然后做修改代理 视频通道全取默认通道 截屏方式默认 秒数直接
-# TODO 现在编辑时间
+# TODO FFmpeg
 
 # 继承QThread
 class Mythread(QThread):
@@ -428,13 +428,20 @@ class QmyMainWindow(QMainWindow):
         if not self.downloadID:
             TWVList = self.GetShipHandleTWValue()  # TableWidgetValueList
             # 这上面有 shipid  扫描时间 视频通道 视频码流
+            front = ""
+            behind = ""
+            save_file_name = ""
+            shipid = ""
             for TWV in TWVList:
-                print(TWV)
                 front = os.path.dirname(__file__)
-                behind = "/%s.dav" % TWV[0]
+                behind = "/videoprocess/%s.dav" % TWV[0]
                 save_file_name = front + behind
+                print(TWV)
+                print(save_file_name)
+                shipid = TWV[0]
+                scantime = TWV[1]
 
-                if TWV[3] != "":        # TODO 看到这里 就确定 登陆之前初始化单号不能运行 我现在是做测试 所有的测试代码
+                if TWV[3] != "":  # TODO 看到这里 就确定 登陆之前初始化单号不能运行 我现在是做测试 所有的测试代码
                     nchannel = int(TWV[3])  # 视频通道      # 像这种庇护的都要删除掉
                 else:
                     nchannel = ""
@@ -445,23 +452,28 @@ class QmyMainWindow(QMainWindow):
                     stream_type = 0
                     self.set_stream_type(stream_type)
 
-                time = TWV[1].strftime("%Y-%m-%d %H:%M:%S")
+                datetime = time.strptime(scantime, "%Y-%m-%d %H:%M:%S")
 
-                startDateTime = NET_TIME()
-                startDateTime.dwYear = 2021
-                startDateTime.dwMonth = 7
-                startDateTime.dwDay = 19
-                startDateTime.dwHour = 5
-                startDateTime.dwMinute = 30
-                startDateTime.dwSecond = 30
+                startDateTime = NET_TIME()  # 下载一秒的视频
+                startDateTime.dwYear = datetime.tm_year
+                startDateTime.dwMonth = datetime.tm_mon
+                startDateTime.dwDay = datetime.tm_mday
+                startDateTime.dwHour = datetime.tm_hour
+                startDateTime.dwMinute = datetime.tm_min
+                startDateTime.dwSecond = datetime.tm_sec
 
                 enddateTime = NET_TIME()
-                enddateTime.dwYear = 2021
-                enddateTime.dwMonth = 7
-                enddateTime.dwDay = 19
-                enddateTime.dwHour = 5
-                enddateTime.dwMinute = 30
-                enddateTime.dwSecond = 35
+                enddateTime.dwYear = datetime.tm_year
+                enddateTime.dwMonth = datetime.tm_mon
+                enddateTime.dwDay = datetime.tm_mday
+                enddateTime.dwHour = datetime.tm_hour
+                enddateTime.dwMinute = datetime.tm_min
+                enddateTime.dwSecond = datetime.tm_sec + 1
+
+                print(startDateTime)
+                print(enddateTime)
+
+                time.sleep(3)  # 暂停三秒 让系统反应文件下载成功 并显示到路径中
 
                 self.downloadID = self.sdk.DownloadByTimeEx(
                     self.loginID, nchannel, int(EM_QUERY_RECORD_TYPE.ALL),
@@ -483,6 +495,11 @@ class QmyMainWindow(QMainWindow):
             else:
                 QMessageBox.about(self, '提示(prompt)',
                                   self.sdk.GetLastErrorMessage())
+
+        ffmpegaddress = front + "\\ffmpeg.exe"
+        videoprocessaddress = front + "\\videoprocess"
+        ConvertVideosInFoldersToPicture(ffmpegaddress, videoprocessaddress)
+        # 传入ffmpeg的地址和要处理的视频存放地址    列出FR下的所有文件 检测文件扩展名为dav 开始处理这个文件 -r 1 暂时没有添加-framerate 帧数 这个参数
 
     def set_stream_type(self, stream_type):
         # set stream type;设置码流类型
