@@ -72,15 +72,15 @@ def handle_excel(file):
         for i in range(len(shipid) - 1):
             # datetime = strptime(scantime[i+1].value,"%Y-%m-%d %H:%M:%S")
             # scantime[i + 1].value.strftime("%Y-%m-%d %H:%M:%S"), 
-            print(scantime[i+1].value)
-            if scantime[i+1].value is None:     # TODO 这是一个永久提示 在Excel中删除的数据会被检测为None 为不是真正的空值
+            print(scantime[i + 1].value)
+            if scantime[i + 1].value is None:  # TODO 这是一个永久提示 在Excel中删除的数据会被检测为None 为不是真正的空值
                 break
             TSOD.append([
-                shipid[i+1].value,
-                scantime[i+1].value.strftime("%Y-%m-%d %H:%M:%S"),
-                YT[i+1].value
+                shipid[i + 1].value,
+                scantime[i + 1].value.strftime("%Y-%m-%d %H:%M:%S"),
+                YT[i + 1].value
             ])
-            YTSET.add(YT[i+1].value)
+            YTSET.add(YT[i + 1].value)
         # 第三列月台排序    这里排序优化是有必要的 等会要做分割的
         TSOD.sort(key=lambda elem: elem[2])
         # 集合转换列表
@@ -114,6 +114,15 @@ def handle_excel(file):
 
 if __name__ == "__main__":
     pass
+
+
+# 二维数据  三维数据是有用的 对每个一维进行时间同天数隔离 最高统计量是按照22个来判断的
+# 1 2021:07:19 YT103 22个
+# 2 2021:07:20 YT103 12个
+# 2 2021:07:21 YT104 5个
+# 一个新列表 里面有三个值 日期 月台 天数
+# 同一天放到一个列表 len这个列表 得出的数值append上去
+# 最后对第三个值进行排序
 
 
 def export_excel(widgetvaluelist, fileaddress):
