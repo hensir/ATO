@@ -1,0 +1,11 @@
+netsdkdllpath = netsdkdllpath_dict[system_type]
+configdllpath = configdllpath_dict[system_type]
+playsdkdllpath = playsdkdllpath_dict[system_type]
+
+这三个dll的位置 需要修改一下
+
+netsdkdllpath_dict = {'windows64': os.path.dirname(__file__) + '\\Libs\\win64\\'+'dhnetsdk.dll', 'windows32': os.path.dirname(__file__) + '\\Libs\\win32\\'+'dhnetsdk.dll','linux64': os.path.dirname(__file__) + '/Libs/linux64/libdhnetsdk.so', 'linux32': os.path.dirname(__file__) + '/Libs/linux32/libdhnetsdk.so'}
+configdllpath_dict = {'windows64': os.path.dirname(__file__) + '\\Libs\\win64\\'+'dhconfigsdk.dll', 'windows32': os.path.dirname(__file__) + '\\Libs\\win32\\'+'dhconfigsdk.dll','linux64': os.path.dirname(__file__) + '/Libs/linux64/libdhconfigsdk.so', 'linux32': os.path.dirname(__file__) + '/Libs/linux32/libdhconfigsdk.so'}
+playsdkdllpath_dict = {'windows64': os.path.dirname(__file__) + '\\Libs\\win64\\'+'dhplay.dll', 'windows32': os.path.dirname(__file__) + '\\Libs\\win32\\'+'dhplay.dll','linux64': os.path.dirname(__file__) + '/Libs/linux64/libdhplay.so', 'linux32': os.path.dirname(__file__) + '/Libs/linux32/libdhplay.so'}
+
+我重写了类方法

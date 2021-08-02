@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 from PyQt5.QtCore import pyqtSlot, Qt, QDate, QThread, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem, QAbstractItemView
 from UI_MainWindow import Ui_MainWindow
@@ -16,7 +17,14 @@ from NetSDK.SDK_Struct import NET_TIME, NET_RECORDFILE_INFO, NET_IN_PLAY_BACK_BY
 
 # TODO 安全措施
 # TODO IP是否输入 账号 密码  初始化列表 导入现在这个表 然后做修改代理 视频通道全取默认通道 截屏方式默认 秒数直接
-# TODO FFmpeg
+# TODO 现在需要 快速多行删除数据行 暂停下载也失效了 整个页面是卡顿的 因为原来的demo例子里 下载是只下载一个的
+# TODO 我们可以偷懒 做个简单 只在listwidget上做删除和添加处理 对√
+# TODO 所以那个作者并没有考虑 我要批量下载 所以进度条的多线程更新 和批量下载没有关系
+# TODO 我觉得加一个多线程进行下载就好了 就一个线程 当然考虑安全性 会不会进程好些 一个界面 一个下载
+# TODO 还有下载进度这个item也没有更新
+# TODO 所有的table处理按钮在 登陆成功且初始化之前都不能使用 不然会找不到item而崩溃 我不想在按钮上做判断 那样太蠢
+# TODO excel的二次识别 也就是 时间判断
+# TODO 那个run还想就没跑过啊 记得看一下demo的下载进度条会不会更新
 
 # 继承QThread
 class Mythread(QThread):
@@ -34,6 +42,17 @@ class Mythread(QThread):
     def update_data(self, total_size, download_size):
         self.breakSignal.emit(total_size, download_size)
 
+
+class MyNetClient(NetClient):
+    @classmethod
+    def _load_library(cls):
+        try:
+            load_library = windll.LoadLibrary
+            cls.sdk = load_library(os.path.dirname(__file__)+"\\Libs\\win64\\dhnetsdk.dll")
+            cls.config_sdk = load_library(os.path.dirname(__file__)+"\\Libs\\win64\\dhconfigsdk.dll")
+            cls.play_sdk = load_library(os.path.dirname(__file__)+"\\Libs\\win64\\dhplay.dll")
+        except OSError as e:
+            print('动态库加载失败')
 
 global wnd
 
@@ -62,6 +81,7 @@ def TimeDownLoadPosCallBack(lPlayHandle, dwTotalSize, dwDownLoadSize, index,
 
 
 class QmyMainWindow(QMainWindow):
+    breakSignal = pyqtSignal(int, int)
     def __init__(self, parent=None):
         super().__init__(parent)  # 调用父类构造函数，创建窗体
 
@@ -72,36 +92,46 @@ class QmyMainWindow(QMainWindow):
         # self.ui.pB2.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex())
         self.ui.pB2.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(1))
         # self.ui.pB4.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(3))
+        
+        self.ui.pB5.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(2))
         # 声明实例变量
         self._excelFileAddress = ""  # TODO 这里也可以把FL给添加到selfinit里
         # 优化改动UI
-        self.ui.excelTW.setAlternatingRowColors(True)  # 交替行颜色
-        self.ui.channelListTW.setAlternatingRowColors(True)  # 交替行颜色
-        self.ui.shipHandleTW.setAlternatingRowColors(True)
         self.ui.excelTW.horizontalHeader().setVisible(True)  # 列头可见
         self.ui.excelTW.verticalHeader().setVisible(True)  # 行头可见
         self.ui.excelTW.setEditTriggers(QAbstractItemView.NoEditTriggers)  # 默认不允许编辑
-        # 大华sdk
 
-        # NetSDK用到的相关变量和回调
+        # 大华sdk NetSDK用到的相关变量和回调
         self.loginID = C_LLONG()
         self.downloadID = C_LLONG()
         self.m_DisConnectCallBack = fDisConnect(self.DisConnectCallBack)
         self.m_ReConnectCallBack = fHaveReConnect(self.ReConnectCallBack)
-
+        # 刷新下载进度
         self.thread = Mythread()
         self.thread.breakSignal.connect(self.update_download_progress)  # 连接刷新进度条的方法
         self.thread.start()
 
         # 获取NetSDK对象并初始化
-        self.sdk = NetClient()
-        self.sdk.InitEx(self.m_DisConnectCallBack)
-        self.sdk.SetAutoReconnect(self.m_ReConnectCallBack)
-
+        try:
+            self.sdk = MyNetClient()
+            # self.sdk._load_library()  # 这句注释掉 实例对象是就已经在初始化中运行过加载动态库了
+            self.sdk.InitEx(self.m_DisConnectCallBack)
+            self.sdk.SetAutoReconnect(self.m_ReConnectCallBack)
+        except Exception as e:
+            print(e)
         # 测试预填充数据
-        self._excelFileAddress = "C:\\Users\\Hast\\Desktop\\07.19\\表2\\广东中山分拨中心.xlsx"
-        self.ui.handlePB.click()
-        self.ui.ListIniPB.click()
+        # self._excelFileAddress = "C:\\Users\\Hast\\Desktop\\07.19\\表2\\广东中山分拨中心.xlsx"
+        # self.ui.iPLineEdit.setText("10.30.15.216")
+        # self.ui.portLE.setText("80")
+        # self.ui.usernmLE.setText("admin")
+        # self.ui.passwdLE.setText("450000ydzz")
+        print(os.path.dirname(__file__)+"\\Libs\\win64\\")
+        front = os.path.dirname(__file__)
+        print(front)
+        videoprocessaddress = front + "\\videoprocess"
+        self.ui.VALE.setText(videoprocessaddress)
+        # self.ui.handlePB.click()
+        # self.ui.ListIniPB.click()
 
     # 类方法 内部要用的方法
     def GetExcelTWValue(self):
@@ -396,13 +426,14 @@ class QmyMainWindow(QMainWindow):
                 self.setWindowTitle(title + ' 在线(OnLine)')
                 # self.Login_pushButton.setText('登出')
                 self.ui.LoginPB.setText('登出')
+                self.ui.ListIniPB.setEnabled(True)
                 self.ui.ListSelHandlePB.setEnabled(True)
                 self.ui.defaultChannelCB.setEnabled(True)
                 self.ui.defaultStreamCB.setEnabled(True)
 
                 self.set_stream_type(0)
                 for i in range(int(device_info.nChanNum)):
-                    self.defaultChannelCB.addItem(str(i))
+                    self.ui.defaultChannelCB.addItem(str(i))
             else:
                 QMessageBox.about(self, '提示(prompt)', error_msg)
         else:
@@ -416,11 +447,12 @@ class QmyMainWindow(QMainWindow):
                 # self.Login_pushButton.setText("登录(Login)")
                 self.ui.LoginPB.setText("登录")
                 self.loginID = 0
-                self.ui.defaultStreamCB.setEnabled(True)
-                self.ui.ListSelHandlePB.setEnabled(True)
-                self.ui.defaultChannelCB.setEnabled(True)
+                self.ui.ListIniPB.setEnabled(False)
+                self.ui.defaultStreamCB.setEnabled(False)
+                self.ui.ListSelHandlePB.setEnabled(False)
+                self.ui.defaultChannelCB.setEnabled(False)
                 self.ui.ListSelHandlePB.setText("开始下载选中单号")
-                self.defaultChannelCB.clear()
+                self.ui.defaultChannelCB.clear()
                 self.ui.downloadBar.setValue(0)
                 self.thread.update_data(1, 0)
 
@@ -452,7 +484,8 @@ class QmyMainWindow(QMainWindow):
                     stream_type = 0
                     self.set_stream_type(stream_type)
 
-                datetime = time.strptime(scantime, "%Y-%m-%d %H:%M:%S")
+                # datetime = os.times.strptime(scantime, "%Y-%m-%d %H:%M:%S")
+                datetime = time.strptime(scantime,"%Y-%m-%d %H:%M:%S")
 
                 startDateTime = NET_TIME()  # 下载一秒的视频
                 startDateTime.dwYear = datetime.tm_year
@@ -496,9 +529,9 @@ class QmyMainWindow(QMainWindow):
                 QMessageBox.about(self, '提示(prompt)',
                                   self.sdk.GetLastErrorMessage())
 
-        ffmpegaddress = front + "\\ffmpeg.exe"
-        videoprocessaddress = front + "\\videoprocess"
-        ConvertVideosInFoldersToPicture(ffmpegaddress, videoprocessaddress)
+        # ffmpegaddress = front + "\\ffmpeg.exe"
+        # videoprocessaddress = front + "\\videoprocess"
+        # ConvertVideosInFoldersToPicture(ffmpegaddress, videoprocessaddress)
         # 传入ffmpeg的地址和要处理的视频存放地址    列出FR下的所有文件 检测文件扩展名为dav 开始处理这个文件 -r 1 暂时没有添加-framerate 帧数 这个参数
 
     def set_stream_type(self, stream_type):
@@ -562,6 +595,19 @@ class QmyMainWindow(QMainWindow):
         except Exception as e:
             print(e)
 
+    def on_VTPPB_clicked(self):
+        # video to picture pushbutton
+        front = os.path.dirname(__file__)
+        # behind = "/videoprocess/%s.dav" % TWV[0]
+        # save_file_name = front + behind
+        ffmpegaddress = front + "\\ffmpeg.exe"
+        videoprocessaddress = front + "\\videoprocess"
+        
+
+        ConvertVideosInFoldersToPicture(ffmpegaddress, videoprocessaddress)
+        # 传入ffmpeg的地址和要处理的视频存放地址    列出FR下的所有文件 检测文件扩展名为dav 开始处理这个文件 -r 1 暂时没有添加-framerate 帧数 这个参数
+
+        
 
 if __name__ == "__main__":  # 用于当前窗体测试
     app = QApplication(sys.argv)  # 创建GUI应用程序

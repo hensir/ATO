@@ -1,7 +1,7 @@
 import subprocess
 
 from openpyxl import load_workbook, Workbook
-from time import strftime
+from time import strftime, strptime
 import os
 
 from openpyxl.styles import Alignment
@@ -70,9 +70,13 @@ def handle_excel(file):
         YTSET = set()  # 月台集合 不重复
         # 单元格类数据转换 对应的int datetime str 三个类型 顺便用这个循环创建了一个月台集合 分割月台的时候要用
         for i in range(len(shipid) - 1):
+            # datetime = strptime(scantime[i+1].value,"%Y-%m-%d %H:%M:%S")
+            # scantime[i + 1].value.strftime("%Y-%m-%d %H:%M:%S"), 
+            print(scantime[i].value)
             TSOD.append([
                 shipid[i + 1].value,
-                scantime[i + 1].value.strftime("%Y-%m-%d %H:%M:%S"), YT[i + 1].value
+                scantime[i + 1].value.strftime("%Y-%m-%d %H:%M:%S"),
+                YT[i + 1].value
             ])
             YTSET.add(YT[i + 1].value)
         # 第三列月台排序    这里排序优化是有必要的 等会要做分割的
@@ -98,11 +102,16 @@ def handle_excel(file):
         for i in FL:
             print(i)
         return FL
+
         # 保留了列表推导式之前的写法 以免日后出事 解不开
         # for j in range(len(YTSET)):
         #     for i in range(len(TSOD)):
         #         if TSOD[i][2] == YTSET[j]:
         #             YTsingle[j].append(TSOD[i])
+
+
+if __name__ == "__main__":
+    pass
 
 
 def export_excel(widgetvaluelist, fileaddress):
@@ -146,9 +155,8 @@ def ConvertVideosInFoldersToPicture(ffmpegaddress, folderaddress):
         print(shipid)
         print(ext)
         if ext == ".dav":
-            parameter = " -i {}\\{} -r 1 {}\\%3d.jpeg".format(videoprocessaddress, file, videoprocessaddress)
+            parameter = " -i {}\\{} -r 1 -t 1 {}\\{}.jpeg".format(folderaddress, file, folderaddress, shipid)
             print(parameter)
             cmd = ffmpegaddress + parameter
             print(cmd)
             subprocess.Popen(cmd)
-
