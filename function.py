@@ -72,13 +72,15 @@ def handle_excel(file):
         for i in range(len(shipid) - 1):
             # datetime = strptime(scantime[i+1].value,"%Y-%m-%d %H:%M:%S")
             # scantime[i + 1].value.strftime("%Y-%m-%d %H:%M:%S"), 
-            print(scantime[i].value)
+            print(scantime[i+1].value)
+            if scantime[i+1].value is None:     # TODO 这是一个永久提示 在Excel中删除的数据会被检测为None 为不是真正的空值
+                break
             TSOD.append([
-                shipid[i + 1].value,
-                scantime[i + 1].value.strftime("%Y-%m-%d %H:%M:%S"),
-                YT[i + 1].value
+                shipid[i+1].value,
+                scantime[i+1].value.strftime("%Y-%m-%d %H:%M:%S"),
+                YT[i+1].value
             ])
-            YTSET.add(YT[i + 1].value)
+            YTSET.add(YT[i+1].value)
         # 第三列月台排序    这里排序优化是有必要的 等会要做分割的
         TSOD.sort(key=lambda elem: elem[2])
         # 集合转换列表
