@@ -23,7 +23,7 @@ from NetSDK.SDK_Struct import NET_TIME, NET_RECORDFILE_INFO, NET_IN_PLAY_BACK_BY
 # TODO 我觉得加一个多线程进行下载就好了 就一个线程 当然考虑安全性 会不会进程好些 一个界面 一个下载
 # TODO 还有下载进度这个item也没有更新
 # TODO 所有的table处理按钮在 登陆成功且初始化之前都不能使用 不然会找不到item而崩溃 我不想在按钮上做判断 那样太蠢
-# TODO excel的二次识别 也就是 时间判断
+# TODO excel的二次识别 也就是 时间判断  成功了 可以在excel里手动删除不想要的数据
 # TODO 那个run还想就没跑过啊 记得看一下demo的下载进度条会不会更新
 
 # 继承QThread
